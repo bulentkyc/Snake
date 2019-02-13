@@ -4,9 +4,7 @@ const context = canvas.getContext('2d');
 // create the unit
 const box = 32;
 
-// load images
-const groundImg = new Image();
-groundImg.src = './img/ground.png'
+let countDown = 10;
 
 const foodImg = new Image();
 foodImg.src = './img/food.png';
@@ -68,15 +66,48 @@ function direction(event){
 // draw everything to canvas
 function draw() {
     // Draw ground to the canvas
-    context.drawImage(groundImg,0,0);
+    //context.drawImage(groundImg,0,0);
+
+    for(let x = 0; x< 19; x++){
+        for(let y = 0; y< 19; y++){
+            if(y<2) {
+                context.fillStyle = '#873600';
+                context.fillRect(x*box, y*box,box,box);
+            }else if(y<3){
+                context.fillStyle = '#6E2C00';
+                context.fillRect(x*box, y*box,box,box);
+            }else if(x==0){
+                context.fillStyle = '#6E2C00';
+                context.fillRect(x*box, y*box,box,box);
+            }else if(x==18){
+                context.fillStyle = '#6E2C00';
+                context.fillRect(x*box, y*box,box,box);
+            }else if(y==18){
+                context.fillStyle = '#6E2C00';
+                context.fillRect(x*box, y*box,box,box);
+            }else{
+                context.fillStyle = ((x % 2 != 0 && y % 2 == 0) ||
+                (x % 2 == 0 && y % 2 != 0))? '#E59866' : '#F0B27A';
+                context.fillRect(x*box, y*box,box,box);
+            }
+        }
+    }
+
+    showCount();
+
+    //fraw food for score
+    context.drawImage(foodImg, box, 0.6*box);
 
     // Draw snake
     for(let i = 0; i< snake.length; i++){
-        context.fillStyle = (i==0)? 'green' : 'white';
-        context.fillRect(snake[i].x, snake[i].y,box,box);
-
-        context.strokeStyle = 'red';
-        context.strokeRect(snake[i].x, snake[i].y,box,box);
+        context.fillStyle = (i==0)? '#6E2C00' : '#873600';
+        const half =box/2;
+        context.beginPath();
+        context.arc(snake[i].x+half, snake[i].y+half,half,0,2 * Math.PI);
+        context.fill();
+        context.closePath();
+        
+        
     }
 
     // Draw food randomly
@@ -86,6 +117,8 @@ function draw() {
     context.fillStyle = 'white';
     context.font = '45px Changa one'
     context.fillText(score, 2*box,1.6*box);
+
+    
 
     // old head position
     let snakeX = snake[0].x;
@@ -109,6 +142,7 @@ function draw() {
     // If the snake eats the food
     if(snakeX == food.x && snakeY == food.y){
         score+=10;
+        speedUp();
         eat.play();
         food = {
             x : Math.floor(Math.random()*17+1) * box,
@@ -148,5 +182,25 @@ let refreshTime = 500;
 // call draw function every 100 ms
 let game = setInterval(draw,refreshTime);
 
+
+speedUp = () => {
+    clearInterval(game);
+    setInterval(draw,refreshTime-score);
+}
+let counter = () => {
+    countDown-=1;
+    if (countDown ==0) {
+        clearInterval(count);
+    }
+
+}
+
+let showCount = () => {
+    // Style countDown
+    context.fillStyle = 'white';
+    context.font = '45px Changa one'
+    context.fillText(countDown, 17*box,1.6*box);
+}
+let count = setInterval(counter, 1000);
 
 
